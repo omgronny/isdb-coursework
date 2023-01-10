@@ -1,1 +1,0 @@
-cp target/debug/server ../public_html/
