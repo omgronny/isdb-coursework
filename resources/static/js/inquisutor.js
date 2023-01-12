@@ -9,10 +9,19 @@ Vue.component('jedi-request-form', {
         }
     },
     template:
-        '<div>' +
-        '<input type="text" placeholder="Write name of the jedi" id="jedi_request_name" v-model="jedi_request_name" />' +
-        '<input type="text" placeholder="Write price" id="jedi_request_price" v-model="jedi_request_price" />' +
-        '<input type="button" value="Save" @click="save" />' +
+        '<div style="max-width: 500px; padding: 15px;">' +
+        '<div class="text-field">\n' +
+        '      <label class="text-field__label" for="username">Name</label>\n' +
+        '      <input class="text-field__input" type="text" placeholder="Write name of the jedi" id="jedi_request_name" v-model="jedi_request_name">\n' +
+        '</div>' +
+        '<div class="text-field">\n' +
+        '      <label class="text-field__label" for="username">Price</label>\n' +
+        '      <input class="text-field__input" placeholder="Write price" id="jedi_request_price" v-model="jedi_request_price">\n' +
+        '</div>' +
+        // '<div>' +
+        // '<input type="text" placeholder="Write name of the jedi" id="jedi_request_name" v-model="jedi_request_name" />' +
+        // '<input type="text" placeholder="Write price" id="jedi_request_price" v-model="jedi_request_price" />' +
+        '<input type="button" value="Send" @click="save" />' +
         '</div>',
     methods: {
         save: function() {
@@ -76,7 +85,13 @@ Vue.component('jedi-buy-form', {
     },
     template:
         '<div>' +
-        '<input type="text" placeholder="Write name of the jedi" id="jedi_buy_id" v-model="jedi_buy_id" />' +
+        '<div style="max-width: 300px;">' +
+            '<div class="text-field">\n' +
+            '      <label class="text-field__label" for="username">Name</label>\n' +
+            '      <input class="text-field__input" type="text" placeholder="Write name of the jedi" id="jedi_buy_id" v-model="jedi_buy_id" />' +
+            '</div>' +
+        '</div>' +
+        // '<input type="text" placeholder="Write name of the jedi" id="jedi_buy_id" v-model="jedi_buy_id" />' +
         '<input type="button" value="Save" @click="save" />' +
         '</div>',
     methods: {
@@ -128,11 +143,15 @@ var app = new Vue({
     template:
         '<div>' +
         '<div class=".overlay">' +
-        '<jedi-request-form :requests="requests"/>' +
-        '<jedi-requests-list :requests="requests" />' +
-        '<jedi-my-data-list :my_jedi_data="my_jedi_data" />' +
-        '<jedi-pre-data-list :jedi_pre_data="jedi_pre_data" />' +
-        '<jedi-list :jedi="jedi" />' +
+            '<jedi-request-form :requests="requests"/>' +
+            '<jedi-requests-list :requests="requests" />' +
+            '<jedi-my-data-list :my_jedi_data="my_jedi_data" />' +
+            '<div style="margin-left: 35%; z-index: 15; margin-top: -20%">' +
+                '<jedi-pre-data-list :jedi_pre_data="jedi_pre_data" />' +
+                '<div style="margin-left: 50%; z-index: 16; margin-top: -37%">' +
+                    '<jedi-list :jedi="jedi" />' +
+                '</div>' +
+            '</div>' +
         '</div>' +
         '<div>' +
         '<div class="space layer1"></div>' +

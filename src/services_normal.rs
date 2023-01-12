@@ -22,6 +22,12 @@ pub async fn get_root_normal(data: web::Data<Arc<Mutex<AppState>>>) -> impl Resp
     HttpResponse::Ok().body(contents)
 }
 
+#[get("/walker.scss")]
+pub async fn get_walker() -> HttpResponse {
+    let contents = fs::read_to_string("resources/static/walker.scss").unwrap();
+    HttpResponse::Ok().body(contents)
+}
+
 #[get("/data")]
 pub async fn get_all_normal(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     use crate::schema::*;

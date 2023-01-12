@@ -37,6 +37,20 @@ mod services_normal;
     -
  */
 
+/* TODO: настроить покупку
+    - инквищитору и нормалу добавить баланс
+    - инквизитору добавить форму покупки
+    - прикрутить к этому триггеры и функции
+*/
+
+/* TODO: наемник
+    - инквизитору добавить покупку наемников
+    - придумать интерфейс для наемника
+        - наемник может принимать заявки ??
+        - сам может покупать инфу
+        - есть Jedi и Jedi Request
+*/
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
@@ -66,6 +80,7 @@ async fn main() -> std::io::Result<()> {
                 .route("/normal.html", web::get().to(index)),
             )
             .service(get_js)
+            .service(get_walker)
             .service(get_root_normal)
             .service(get_root_inquisitor)
             .service(get_all_normal)
