@@ -15,11 +15,29 @@ use diesel::sql_types::Uuid;
 
 use crate::{establish_connection, VecOfMap};
 use crate::models::*;
+use crate::schema::jedi_data::price;
 
 #[get("/normal")]
 pub async fn get_root_normal(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     let contents = fs::read_to_string("resources/static/normal.html").unwrap();
     HttpResponse::Ok().body(contents)
+}
+
+#[get("/normal-id/{id}")]
+pub async fn get_money_normal(path: web::Path<usize>, data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
+    use crate::schema::*;
+
+    let conn = &mut establish_connection();
+    let uid = path.into_inner() as i32;
+
+    let result: Vec<i32> = normals::dsl::normals
+        .filter(normals::dsl::id.eq(uid))
+        .select(normals::dsl::money)
+        .load(conn)
+        .expect("Error loading");
+
+    HttpResponse::Ok().json(result)
+
 }
 
 #[get("/walker.scss")]

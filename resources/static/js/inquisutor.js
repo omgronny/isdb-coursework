@@ -1,5 +1,30 @@
-var JediRequestApi = Vue.resource('/request{/id}');
 
+var amountApi = Vue.resource('/inquisitor-id{/id}');
+Vue.component('inquisitor-money', {
+    data: function() {
+        return {
+            id: '',
+            in_money: ''
+        }
+    },
+    template:
+        '<div>' +
+        '<table style="margin-top: -1%">' +
+        '<tr><th>My Money</th></tr>' +
+        '<tr><td>{{ in_money }}</td></tr>' +
+        '</table>' +
+        '</div>',
+    created: function () {
+        this.id = 1;
+        amountApi.get({ id: this.id }).then(result =>
+            result.json().then(data =>
+                data.forEach(amount => this.in_money = amount)
+            )
+        )
+    }
+});
+
+var JediRequestApi = Vue.resource('/request{/id}');
 Vue.component('jedi-request-form', {
     props: ['requests'], // , 'messageAttr'
     data: function() {
@@ -18,9 +43,6 @@ Vue.component('jedi-request-form', {
         '      <label class="text-field__label" for="username">Price</label>\n' +
         '      <input class="text-field__input" placeholder="Write price" id="jedi_request_price" v-model="jedi_request_price">\n' +
         '</div>' +
-        // '<div>' +
-        // '<input type="text" placeholder="Write name of the jedi" id="jedi_request_name" v-model="jedi_request_name" />' +
-        // '<input type="text" placeholder="Write price" id="jedi_request_price" v-model="jedi_request_price" />' +
         '<input type="button" value="Send" @click="save" />' +
         '</div>',
     methods: {
@@ -87,8 +109,8 @@ Vue.component('jedi-buy-form', {
         '<div>' +
         '<div style="max-width: 300px;">' +
             '<div class="text-field">\n' +
-            '      <label class="text-field__label" for="username">Name</label>\n' +
-            '      <input class="text-field__input" type="text" placeholder="Write name of the jedi" id="jedi_buy_id" v-model="jedi_buy_id" />' +
+            '      <label class="text-field__label" for="username">Id</label>\n' +
+            '      <input class="text-field__input" type="text" placeholder="Write id of the info you want to buy" id="jedi_buy_id" v-model="jedi_buy_id" />' +
             '</div>' +
         '</div>' +
         // '<input type="text" placeholder="Write name of the jedi" id="jedi_buy_id" v-model="jedi_buy_id" />' +
@@ -143,6 +165,7 @@ var app = new Vue({
     template:
         '<div>' +
         '<div class=".overlay">' +
+            '<inquisitor-money />' +
             '<jedi-request-form :requests="requests"/>' +
             '<jedi-requests-list :requests="requests" />' +
             '<jedi-my-data-list :my_jedi_data="my_jedi_data" />' +

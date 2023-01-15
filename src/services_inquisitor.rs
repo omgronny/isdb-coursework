@@ -15,6 +15,7 @@ use diesel::sql_types::Uuid;
 
 use crate::{establish_connection, VecOfMap};
 use crate::models::*;
+use crate::schema::jedi_data::dsl::jedi_data;
 
 #[get("/inquisitor")]
 pub async fn get_root_inquisitor(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
@@ -22,6 +23,22 @@ pub async fn get_root_inquisitor(data: web::Data<Arc<Mutex<AppState>>>) -> impl 
     HttpResponse::Ok().body(contents)
 }
 
+#[get("/inquisitor-id/{id}")]
+pub async fn get_money_inquisitor(path: web::Path<usize>, data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
+    use crate::schema::*;
+
+    let conn = &mut establish_connection();
+    let uid = path.into_inner() as i32;
+
+    let result: Vec<i32> = inquisitors::dsl::inquisitors
+        .filter(inquisitors::dsl::id.eq(uid))
+        .select(inquisitors::dsl::money)
+        .load(conn)
+        .expect("Error loading");
+
+    HttpResponse::Ok().json(result)
+
+}
 
 #[get("/request")]
 pub async fn get_all_requests(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
@@ -40,7 +57,6 @@ pub async fn get_all_requests(data: web::Data<Arc<Mutex<AppState>>>) -> impl Res
 
     HttpResponse::Ok().json(result)
 }
-
 
 #[post("/request")]
 pub async fn post_requests(new_one: web::Json<GetJediRequest>, data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
@@ -119,6 +135,8 @@ pub async fn get_all_data_for_inquisitor(data: web::Data<Arc<Mutex<AppState>>>) 
     HttpResponse::Ok().json(result)
 }
 
+
+
 #[post("/inquisitor/data")]
 pub async fn post_inquisitor_data(new_one: web::Json<BuyJediData>, data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
     use crate::schema::*;
@@ -126,9 +144,27 @@ pub async fn post_inquisitor_data(new_one: web::Json<BuyJediData>, data: web::Da
     let conn = &mut establish_connection();
     let values = new_one.into_inner();
     let jedi_buy_id = values.buy_id;
-    let jedi_jedi_id = values.jedi_id;
+    let inquisitor_id = values.jedi_id;
 
-    let new_buy = NewJediDataInquisitor { inquisitor_id: &jedi_jedi_id, jedi_data_id: &jedi_buy_id };
+    // достаем нужного нормала и цену из таблицы
+    let normal_price : Vec<(i32, Option<i32>)> = jedi_data::dsl::jedi_data
+        .select((jedi_data::dsl::normal_id, jedi_data::dsl::price))
+        .filter(jedi_data::dsl::id.eq(jedi_buy_id))
+        .load(conn)
+        .expect("Error loading");
+    let (normal_id, amount) = normal_price[0];
+
+    // забрать у инквизитора деньги
+    // прибавить нормалу
+    diesel::sql_query("call inquisitor_pay_to_normal($1, $2, $3)")
+        .bind::<diesel::sql_types::Integer, _>(normal_id)
+        .bind::<diesel::sql_types::Integer, _>(inquisitor_id)
+        .bind::<diesel::sql_types::Integer, _>(amount.expect("amount is null"))
+        .execute(conn)
+        .expect("An error has occured");
+
+    // добавляем инквизитору данные в my_data
+    let new_buy = NewJediDataInquisitor { inquisitor_id: &inquisitor_id, jedi_data_id: &jedi_buy_id };
 
     let res_buy_jedi: JediDataInquisitor = diesel::insert_into(jedi_data_inquisitors::table)
         .values(&new_buy)

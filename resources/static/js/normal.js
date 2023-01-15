@@ -1,4 +1,29 @@
 
+var amountApi = Vue.resource('/normal-id{/id}');
+Vue.component('normal-money', {
+    data: function() {
+        return {
+            id: '',
+            in_money: ''
+        }
+    },
+    template:
+        '<div>' +
+        '<table style="margin-top: -1%">' +
+        '<tr><th>My Money</th></tr>' +
+        '<tr><td>{{ in_money }}</td></tr>' +
+        '</table>' +
+        '</div>',
+    created: function () {
+        this.id = 2;
+        amountApi.get({ id: this.id }).then(result =>
+            result.json().then(data =>
+                data.forEach(amount => this.in_money = amount)
+            )
+        )
+    }
+});
+
 var JedidataApi = Vue.resource('/data{/id}');
 Vue.component('jedi-data-form', {
     props: ['jedi_data'], // , 'messageAttr'
@@ -12,7 +37,7 @@ Vue.component('jedi-data-form', {
         }
     },
     template:
-        '<div style="max-width: 500px; margin-left: 60%">' +
+        '<div style="max-width: 500px; margin-left: 60%; margin-top: -1%">' +
         '<div class="text-field">\n' +
         '      <label class="text-field__label" for="username">Name</label>\n' +
         '      <input class="text-field__input" type="text" placeholder="Write name of the jedi" id="jedi_data_name" v-model="jedi_data_name" />' +
@@ -94,9 +119,10 @@ var app = new Vue({
     template:
         '<div>' +
         '<div class=".overlay">' +
-        '<jedi-data-list :jedi_data="jedi_data" />' +
-        '<jedi-requests-list :requests="requests" />' +
-        '<jedi-list :jedi="jedi" />' +
+            '<normal-money />' +
+            '<jedi-data-list :jedi_data="jedi_data" />' +
+            '<jedi-requests-list :requests="requests" />' +
+            '<jedi-list :jedi="jedi" />' +
         '</div>' +
         '<div class="sand"></div>\n' +
         '<div class="bb8">\n' +
@@ -127,6 +153,7 @@ var app = new Vue({
     data: {
         jedi_data: [],
         requests: [],
-        jedi: []
+        jedi: [],
+        money: '',
     }
 });
