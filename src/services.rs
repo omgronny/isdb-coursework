@@ -8,17 +8,85 @@ use std::fmt::format;
 use std::sync::{Arc, Mutex};
 use std::sync::atomic::Ordering;
 
-use actix_web::{App, delete, get, HttpResponse, HttpServer, post, put, Responder, web};
+use actix_web::{App, delete, get, HttpRequest, HttpResponse, HttpServer, post, put, Responder, web};
 use diesel::{QueryDsl, RunQueryDsl};
 use diesel::prelude::*;
 use diesel::sql_types::Uuid;
 
-use crate::{establish_connection, VecOfMap};
+use crate::{establish_connection};
 use crate::models::*;
+
+use qstring::QString;
 
 pub async fn not_found() -> HttpResponse {
     let contents = fs::read_to_string("resources/static/404.html").unwrap();
     HttpResponse::NotFound().body(contents)
+}
+
+#[get("/")]
+pub async fn get_root(data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
+    let contents = fs::read_to_string("resources/static/registration.html").unwrap();
+    HttpResponse::Ok().body(contents)
+}
+
+#[get("/login")]
+pub async fn register(req: HttpRequest, data: web::Data<Arc<Mutex<AppState>>>) -> impl Responder {
+    use crate::schema::*;
+
+    println!("{}", req.query_string());
+
+    let query_str = req.query_string();
+    let qs = QString::from(query_str);
+
+    // сохранить id в app state
+    let user_name = qs.get("name").unwrap();
+    let user_type = qs.get("user_type").unwrap();
+
+    println!("{user_type}");
+
+    let conn = &mut establish_connection();
+    let contents = if user_type == "normal" {
+
+        let result: Vec<i32> = normals::dsl::normals
+            .filter(normals::dsl::name.eq(user_name))
+            .select(normals::dsl::id)
+            .load(conn)
+            .expect("Error loading");
+
+        if result.len() > 0 {
+            data.lock().unwrap().id_nor = result[0];
+        } else {
+            println!("result.len() == 0");
+        }
+
+        fs::read_to_string("resources/static/normal.html").unwrap()
+
+    } else if user_type == "inquisitor" {
+
+        let result: Vec<i32> = inquisitors::dsl::inquisitors
+            .filter(inquisitors::dsl::name.eq(user_name))
+            .select(inquisitors::dsl::id)
+            .load(conn)
+            .expect("Error loading");
+
+        if result.len() > 0 {
+            data.lock().unwrap().id_inq = result[0];
+        } else {
+            println!("result.len() == 0");
+        }
+
+        fs::read_to_string("resources/static/inquisitor.html").unwrap()
+    } else {
+        fs::read_to_string("resources/static/hunter.html").unwrap()
+    };
+
+    HttpResponse::Ok().body(contents)
+}
+
+#[get("/reg.css")]
+pub async fn get_reg_style() -> HttpResponse {
+    let contents = fs::read_to_string("resources/static/reg.css").unwrap();
+    HttpResponse::Ok().body(contents)
 }
 
 #[get("/js/{filename}")]

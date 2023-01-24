@@ -20,16 +20,10 @@ pub struct Message {
     pub money: String,
 }
 
-#[derive(Serialize, Clone)]
-pub struct VecOfMap {
-    pub vec: Vec<HashMap<String, String>>,
-}
-// type DbPool = r2d2::Pool<ConnectionManager<SqliteConnection>>;
-
 pub struct AppState {
-    pub vec_of_map: VecOfMap,
-    pub id_num: u64,
-    // pub pool: ???
+    pub id_inq: i32,
+    pub id_nor: i32,
+    pub id_hunt: i32,
 }
 
 use crate::schema::*;
@@ -194,4 +188,9 @@ pub struct NewJediDataInquisitor<'a> {
     pub inquisitor_id: &'a i32,
 }
 
+#[derive(Deserialize, Serialize, Clone)]
+pub struct GetUserType {
+    pub name: String,
+    pub user_type: String,
+}
 

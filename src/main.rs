@@ -9,10 +9,11 @@ use actix_web::{App, get, HttpResponse, HttpServer, post, Responder, web};
 use diesel::r2d2::ConnectionManager;
 
 use crate::db::*;
-use crate::models::{AppState, VecOfMap};
+use crate::models::AppState;
 use crate::services::*;
 use crate::services_normal::*;
 use crate::services_inquisitor::*;
+use crate::services_hunter::*;
 
 mod models;
 mod services;
@@ -20,6 +21,7 @@ mod db;
 pub mod schema;
 mod services_inquisitor;
 mod services_normal;
+mod services_hunter;
 
 /*
 Всем нужно видеть 2 основные таблицы: jedi_request и jedi_data
@@ -36,7 +38,6 @@ mod services_normal;
     -
  */
 
-
 /* TODO: наемник
     - инквизитору добавить покупку наемников
     - придумать интерфейс для наемника
@@ -45,36 +46,26 @@ mod services_normal;
         - есть Jedi и Jedi Request
 */
 
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
     let app_name = Vec::<HashMap::<String, String>>::from([]);
     dotenv::dotenv().ok();
 
-    // set up database connection pool
-    // let conn_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL");
-    // let manager = ConnectionManager::<SqliteConnection>::new(conn_spec);
-    // let pool = r2d2::Pool::builder()
-    //     .build(manager)
-    //     .expect("Failed to create pool.");
-
     let data = Arc::new(Mutex::new(
         AppState {
-            vec_of_map: VecOfMap { vec: app_name.clone() },
-            id_num: 0,
-            // pool,
+            id_nor: 0,
+            id_hunt: 0,
+            id_inq: 0,
         }
     ));
 
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(data.clone()))
-            .service(
-            web::scope("/app")
-                .route("/normal.html", web::get().to(index)),
-            )
             .service(get_js)
+            .service(get_root)
+            .service(register)
             .service(get_walker)
             .service(get_root_normal)
             .service(get_root_inquisitor)
@@ -90,10 +81,14 @@ async fn main() -> std::io::Result<()> {
             .service(get_all_data_for_inquisitor)
             .service(post_inquisitor_data)
             .service(get_money_inquisitor)
+            .service(get_root_hunter)
+            .service(get_money_hunter)
+            .service(get_strooper)
+            .service(get_reg_style)
             .default_service(
                 web::route().to(not_found)
             )
-    })    .bind(("127.0.0.1", 8080))?
+    })    .bind(("127.0.0.1", 2471))?
     .run()
     .await
 }

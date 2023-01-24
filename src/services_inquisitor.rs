@@ -13,7 +13,7 @@ use diesel::{QueryDsl, RunQueryDsl};
 use diesel::prelude::*;
 use diesel::sql_types::Uuid;
 
-use crate::{establish_connection, VecOfMap};
+use crate::{establish_connection};
 use crate::models::*;
 use crate::schema::jedi_data::dsl::jedi_data;
 
@@ -28,7 +28,8 @@ pub async fn get_money_inquisitor(path: web::Path<usize>, data: web::Data<Arc<Mu
     use crate::schema::*;
 
     let conn = &mut establish_connection();
-    let uid = path.into_inner() as i32;
+    // let uid = path.into_inner() as i32;
+    let uid = data.lock().unwrap().id_inq;
 
     let result: Vec<i32> = inquisitors::dsl::inquisitors
         .filter(inquisitors::dsl::id.eq(uid))
