@@ -36,7 +36,7 @@ mod services_hunter;
     -
 У наемника:
     -
- */
+*/
 
 /* TODO: наемник
     - инквизитору добавить покупку наемников
@@ -88,7 +88,7 @@ async fn main() -> std::io::Result<()> {
             .default_service(
                 web::route().to(not_found)
             )
-    })    .bind(("127.0.0.1", 2471))?
+    })    .bind(("127.0.0.1", 2472))?
     .run()
     .await
 }

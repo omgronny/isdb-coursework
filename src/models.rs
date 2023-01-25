@@ -80,6 +80,14 @@ pub struct Inquisitor {
     pub power: i32,
     pub money: i32,
 }
+#[derive(Insertable)]
+#[diesel(table_name = inquisitors)]
+pub struct NewInquisitor<'a> {
+    pub name: &'a str,
+    pub power: &'a i32,
+    pub money: &'a i32,
+}
+
 
 #[derive(Queryable, Debug, Identifiable)]
 #[diesel(primary_key(inquisitor_id, squad_id))]

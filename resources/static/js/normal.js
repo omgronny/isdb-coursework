@@ -33,11 +33,11 @@ Vue.component('jedi-data-form', {
             jedi_data_planet: '',
             jedi_data_team: '',
             jedi_data_ship: '',
-            jedi_price: '',
+            jedi_data_price: '',
         }
     },
     template:
-        '<div style="max-width: 500px; margin-left: 60%; margin-top: -1%">' +
+        '<div style="max-width: 500px; margin-left: 55%; margin-top: -1%">' +
         '<div class="text-field">\n' +
         '      <label class="text-field__label" for="username">Name</label>\n' +
         '      <input class="text-field__input" type="text" placeholder="Write name of the jedi" id="jedi_data_name" v-model="jedi_data_name" />' +
@@ -56,7 +56,7 @@ Vue.component('jedi-data-form', {
         // '</div>' +
         // '<div class="text-field">\n' +
         '      <label class="text-field__label" for="username">Price</label>\n' +
-        '      <input class="text-field__input" type="text" placeholder="Write price" id="jedi_price" v-model="jedi_price" />' +
+        '      <input class="text-field__input" type="text" placeholder="Write price you want" id="jedi_data_price" v-model="jedi_data_price" />' +
         '</div>' +
         '<input type="button" value="Save" @click="save" />' +
         '</div>',
@@ -67,7 +67,7 @@ Vue.component('jedi-data-form', {
             this.jedi_data_planet = document.getElementById("jedi_data_planet").value;
             this.jedi_data_team = document.getElementById("jedi_data_team").value;
             this.jedi_data_ship = document.getElementById("jedi_data_ship").value;
-            this.jedi_price = document.getElementById("jedi_price").value;
+            this.jedi_data_price = document.getElementById("jedi_data_price").value;
 
             var message = {
                 name: this.jedi_data_name,
@@ -75,7 +75,7 @@ Vue.component('jedi-data-form', {
                 team: parseInt(this.jedi_data_team),
                 ship: parseInt(this.jedi_data_ship),
                 normal_id: 2,
-                price: parseInt(this.jedi_price)
+                price: parseInt(this.jedi_data_price)
             };
 
             JedidataApi.save(message).then(result =>
@@ -85,7 +85,7 @@ Vue.component('jedi-data-form', {
                     this.jedi_data_planet = '';
                     this.jedi_data_team = '';
                     this.jedi_data_ship = '';
-                    this.jedi_price = '';
+                    this.jedi_data_price = '';
                 })
             )
         }

@@ -53,11 +53,23 @@ pub async fn register(req: HttpRequest, data: web::Data<Arc<Mutex<AppState>>>) -
             .load(conn)
             .expect("Error loading");
 
-        if result.len() > 0 {
-            data.lock().unwrap().id_nor = result[0];
+        data.lock().unwrap().id_nor = if result.len() > 0 {
+            result[0]
         } else {
-            println!("result.len() == 0");
-        }
+
+            // insert into normals
+            let new_normal = NewNormal {
+                name: &user_name,
+                money: &100,
+            };
+
+            let normal: Normal = diesel::insert_into(normals::table)
+                .values(&new_normal)
+                .get_result(conn)
+                .expect("Error saving new data");
+
+            normal.id
+        };
 
         fs::read_to_string("resources/static/normal.html").unwrap()
 
@@ -69,11 +81,24 @@ pub async fn register(req: HttpRequest, data: web::Data<Arc<Mutex<AppState>>>) -
             .load(conn)
             .expect("Error loading");
 
-        if result.len() > 0 {
-            data.lock().unwrap().id_inq = result[0];
+        data.lock().unwrap().id_inq = if result.len() > 0 {
+            result[0]
         } else {
-            println!("result.len() == 0");
-        }
+
+            // insert into normals
+            let new_inquisitor = NewInquisitor {
+                name: &user_name,
+                power: &100,
+                money: &100,
+            };
+
+            let inquisitor: Inquisitor = diesel::insert_into(inquisitors::table)
+                .values(&new_inquisitor)
+                .get_result(conn)
+                .expect("Error saving new data");
+
+            inquisitor.id
+        };
 
         fs::read_to_string("resources/static/inquisitor.html").unwrap()
     } else {
